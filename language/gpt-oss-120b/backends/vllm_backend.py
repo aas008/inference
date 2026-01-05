@@ -5,6 +5,7 @@ import logging
 from typing import List, Dict, Any
 
 from vllm import LLM, SamplingParams
+from vllm.inputs.data import TokensPrompt
 
 from .base_backend import BaseBackend
 
@@ -120,8 +121,11 @@ class VLLMBackend(BaseBackend):
             skip_special_tokens=True,
         )
 
+        # Convert token lists to TokensPrompt objects
+        vllm_prompts = [TokensPrompt(prompt_token_ids=prompt) for prompt in prompts]
+
         outputs = self.llm.generate(
-            prompt_token_ids=prompts,
+            prompts=vllm_prompts,
             sampling_params=sampling_params,
             use_tqdm=False
         )

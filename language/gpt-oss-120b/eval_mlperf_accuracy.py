@@ -444,23 +444,24 @@ def main():
     # Pre-load LiveCodeBench benchmark if needed
     lcb_executor = None
     if any('livecodebench' in ds for ds in dataset_entries.keys()):
+        # Always create the executor for LiveCodeBench, even if pre-loading fails
+        max_workers = min(
+            multiprocessing.cpu_count(),
+            args.num_lcb_workers)
+        lcb_executor = ProcessPoolExecutor(max_workers=max_workers)
+        logger.info(
+            f"Created ProcessPoolExecutor with {max_workers} workers for LiveCodeBench")
+
+        # Try to pre-load benchmark for better performance (workers will inherit via fork)
         try:
             logger.info(
                 "Pre-loading LiveCodeBench benchmark for parallel evaluation...")
             os.environ['TQDM_DISABLE'] = '1'  # Disable tqdm in workers
             _ = load_lcb_benchmark()
             logger.info("LiveCodeBench benchmark loaded successfully")
-
-            # Create shared ProcessPoolExecutor for all LCB evaluations
-            max_workers = min(
-                multiprocessing.cpu_count(),
-                args.num_lcb_workers)
-            lcb_executor = ProcessPoolExecutor(max_workers=max_workers)
-            logger.info(
-                f"Created ProcessPoolExecutor with {max_workers} workers for LiveCodeBench")
         except Exception as e:
             logger.warning(f"Failed to pre-load LiveCodeBench benchmark: {e}")
-            logger.warning("LiveCodeBench evaluation may be slower")
+            logger.warning("Workers will load benchmark individually (may be slower)")
 
     # Process each dataset separately with its own progress bar
     logger.info("\nProcessing MLPerf log entries by dataset...")
