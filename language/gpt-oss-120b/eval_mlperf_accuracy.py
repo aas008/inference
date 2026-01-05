@@ -444,7 +444,8 @@ def main():
     # Pre-load LiveCodeBench benchmark if needed
     lcb_executor = None
     if any('livecodebench' in ds for ds in dataset_entries.keys()):
-        # Always create the executor for LiveCodeBench, even if pre-loading fails
+        # Always create the executor for LiveCodeBench, even if pre-loading
+        # fails
         max_workers = min(
             multiprocessing.cpu_count(),
             args.num_lcb_workers)
@@ -452,7 +453,8 @@ def main():
         logger.info(
             f"Created ProcessPoolExecutor with {max_workers} workers for LiveCodeBench")
 
-        # Try to pre-load benchmark for better performance (workers will inherit via fork)
+        # Try to pre-load benchmark for better performance (workers will
+        # inherit via fork)
         try:
             logger.info(
                 "Pre-loading LiveCodeBench benchmark for parallel evaluation...")
@@ -461,7 +463,8 @@ def main():
             logger.info("LiveCodeBench benchmark loaded successfully")
         except Exception as e:
             logger.warning(f"Failed to pre-load LiveCodeBench benchmark: {e}")
-            logger.warning("Workers will load benchmark individually (may be slower)")
+            logger.warning(
+                "Workers will load benchmark individually (may be slower)")
 
     # Process each dataset separately with its own progress bar
     logger.info("\nProcessing MLPerf log entries by dataset...")

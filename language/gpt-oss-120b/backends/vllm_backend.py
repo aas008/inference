@@ -108,7 +108,8 @@ class VLLMBackend(BaseBackend):
             List of response dictionaries
         """
         if not self.initialized:
-            raise RuntimeError("Backend not initialized. Call initialize() first.")
+            raise RuntimeError(
+                "Backend not initialized. Call initialize() first.")
         if not prompts:
             return []
 
@@ -122,7 +123,8 @@ class VLLMBackend(BaseBackend):
         )
 
         # Convert token lists to TokensPrompt objects
-        vllm_prompts = [TokensPrompt(prompt_token_ids=prompt) for prompt in prompts]
+        vllm_prompts = [TokensPrompt(prompt_token_ids=prompt)
+                        for prompt in prompts]
 
         outputs = self.llm.generate(
             prompts=vllm_prompts,
